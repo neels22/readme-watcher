@@ -30,14 +30,18 @@ jobs:
           else
             echo "changed=false" >> $GITHUB_OUTPUT
           fi
-
+      
       - name: Send Slack Notification
         if: steps.check_diff.outputs.changed == 'true'
         run: |
+          echo "Slack diff preview:"
+          cat diff_output.txt | head -n 30
+      
           DIFF=$(cat diff_output.txt | head -n 30 | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
           curl -X POST -H 'Content-type: application/json' \
             --data "{\"text\":\"📝 *README.md was updated in Summer2026-Internships (Simulated)*\n\n\`\`\`${DIFF}\`\`\`\n<https://github.com/vanshb03/Summer2026-Internships|🔗 View Repository>\"}" \
             https://hooks.slack.com/services/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
+
             
       - name: Save current README.md
         if: steps.check_diff.outputs.changed == 'true'
