@@ -2,7 +2,7 @@ name: Monitor README.md Updates in Summer2026-Internships
 
 on:
   schedule:
-    - cron: '*/10 * * * *'  # every 30 minutes
+    - cron: '*/10 * * * *'  # every 10 minutes
   workflow_dispatch:
 
 jobs:
