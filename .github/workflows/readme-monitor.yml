@@ -1,0 +1,49 @@
+name: Monitor README.md Updates in Summer2026-Internships
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'  # every 30 minutes
+  workflow_dispatch:
+
+jobs:
+  track-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout your repo
+        uses: actions/checkout@v4
+
+      - name: Download latest README.md
+        run: |
+          curl -sL https://raw.githubusercontent.com/vanshb03/Summer2026-Internships/main/README.md -o latest_README.md
+
+      - name: Compare with old README.md
+        id: check_diff
+        run: |
+          mkdir -p storage
+          touch storage/old_README.md
+
+          if ! diff -u storage/old_README.md latest_README.md > diff_output.txt; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Send Slack Notification
+        if: steps.check_diff.outputs.changed == 'true'
+        run: |
+          DIFF=$(cat diff_output.txt | head -n 30 | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{\"text\":\"📝 *README.md was updated in Summer2026-Internships!*\n\n\`\`\`${DIFF}\`\`\`\n<https://github.com/vanshb03/Summer2026-Internships|🔗 View Repository>\"}" \
+            https://hooks.slack.com/services/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
+
+      - name: Save current README.md
+        run: cp latest_README.md storage/old_README.md
+
+      - name: Commit updated README snapshot
+        if: steps.check_diff.outputs.changed == 'true'
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add storage/old_README.md
+          git commit -m "README updated: $(date)"
+          git push
