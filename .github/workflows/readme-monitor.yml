@@ -17,7 +17,7 @@ jobs:
       - name: Download latest README.md (simulate change)
         run: |
           curl -sL https://raw.githubusercontent.com/vanshb03/Summer2026-Internships/main/README.md -o latest_README.md
-          echo "\n<!-- Simulated change for testing at $(date) -->" >> latest_README.md
+          # echo "\n<!-- Simulated change for testing at $(date) -->" >> latest_README.md
 
       - name: Compare with old README.md
         id: check_diff
