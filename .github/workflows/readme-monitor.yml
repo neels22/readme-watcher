@@ -38,6 +38,10 @@ jobs:
           curl -X POST -H 'Content-type: application/json' \
             --data "{\"text\":\"📝 *README.md was updated in Summer2026-Internships (Simulated)*\n\n\`\`\`${DIFF}\`\`\`\n<https://github.com/vanshb03/Summer2026-Internships|🔗 View Repository>\"}" \
             https://hooks.slack.com/services/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
+            
+      - name: Save current README.md
+        if: steps.check_diff.outputs.changed == 'true'
+        run: cp latest_README.md storage/old_README.md
 
       - name: Commit updated README snapshot
         if: steps.check_diff.outputs.changed == 'true'
