@@ -14,10 +14,10 @@ jobs:
         with:
           token: ${{ secrets.GH_PAT }}
 
-
-      - name: Download latest README.md
+      - name: Download latest README.md (simulate change)
         run: |
           curl -sL https://raw.githubusercontent.com/vanshb03/Summer2026-Internships/main/README.md -o latest_README.md
+          echo "\n<!-- Simulated change for testing at $(date) -->" >> latest_README.md
 
       - name: Compare with old README.md
         id: check_diff
@@ -36,14 +36,14 @@ jobs:
         run: |
           DIFF=$(cat diff_output.txt | head -n 30 | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
           curl -X POST -H 'Content-type: application/json' \
-            --data "{\"text\":\"📝 *README.md was updated in Summer2026-Internships!*\n\n\`\`\`${DIFF}\`\`\`\n<https://github.com/vanshb03/Summer2026-Internships|🔗 View Repository>\"}" \
+            --data "{\"text\":\"📝 *README.md was updated in Summer2026-Internships (Simulated)*\n\n\`\`\`${DIFF}\`\`\`\n<https://github.com/vanshb03/Summer2026-Internships|🔗 View Repository>\"}" \
             https://hooks.slack.com/services/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
-  
+
       - name: Commit updated README snapshot
         if: steps.check_diff.outputs.changed == 'true'
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add storage/old_README.md
-          git commit -m "README updated: $(date)"
+          git commit -m "README updated (simulated): $(date)"
           git push origin HEAD:${{ github.ref }}
